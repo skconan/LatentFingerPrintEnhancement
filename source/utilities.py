@@ -51,11 +51,14 @@ def apply_clahe(img_bgr):
     return res
 
 
-def normalize(image, max=255):
+def normalize(image, max=255, input_max=None, input_min=None):
     # image = np.array(image,np.float32)
     print(image.max())
     print(image.min())
-    result = 255.*(image - image.min())/(image.max()-image.min())
+    if input_max is not None:
+        result = 255.*(image - input_min)/(input_max-input_min)
+    else:
+        result = 255.*(image - image.min())/(image.max()-image.min())
     result = np.uint8(result)
     return result
 
