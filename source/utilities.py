@@ -52,9 +52,6 @@ def apply_clahe(img_bgr):
 
 
 def normalize(image, max=255, input_max=None, input_min=None):
-    # image = np.array(image,np.float32)
-    print(image.max())
-    print(image.min())
     if input_max is not None:
         result = 255.*(image - input_min)/(input_max-input_min)
     else:
@@ -67,4 +64,19 @@ def implot(figname, image):
     plt.imshow(image)
     plt.show()
     cv.waitKey(-1)
-    plt.close()    
+    plt.close()   
+
+def imshow(name, mat, mapping=False):
+    if len(mat.shape) < 3:
+        r,c = mat.shape
+    else:
+        r,c,_ = mat.shape
+
+    if mapping:
+        # mat = cv.applyColorMap(mat, cv.COLORMAP_JET)
+        mat = cv.applyColorMap(mat, cv.COLORMAP_HOT)
+        # mat = cv.applyColorMap(mat, cv.COLORMAP_HSV)
+
+    if r < 100:
+        mat = cv.resize(mat,None,fx=4,fy=4)
+    cv.imshow(name,mat)
