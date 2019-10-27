@@ -5,24 +5,26 @@ from matplotlib import pyplot as plt
 
 def spatial2freq(img):
     spectrum = np.fft.fft2(img)
+    # print(spectrum[0,0])
     spectrum = np.fft.fftshift(spectrum)
     return spectrum
 
 
-def freq2spatial(img):
-    img = np.fft.ifftshift(img)
-    img = np.fft.ifft2(img)
-    mag = get_magnitude(img)
-    mag = normalize(mag)
-    return mag
+def freq2spatial(spectrum):
+    spectrum  = np.fft.ifftshift(spectrum )
+    img  = np.fft.ifft2(spectrum )
+    img = get_magnitude(img)
+    img = normalize(img)
+    return img
 
 def get_magnitude(spectrum):
-    magnitude = np.abs(spectrum)
+    # magnitude = np.abs(spectrum)
+    magnitude = np.sqrt(spectrum.real**2 + spectrum.imag**2)
     return magnitude
 
 def get_phase(spectrum):
     return np.angle(spectrum)
 
 def to_logscale(img):
-    return normalize(np.log(img))
+    return np.log(1+img)
 
