@@ -83,7 +83,7 @@ def imshow(name, mat, mapping=False):
 
 
 def getGaussianKernel2D(ksize,sigmaX,sigmaY):
-    if type(ksize) == tuple:
+    if not type(ksize) == tuple:
         print("Ksize is",type(ksize),"is not Tuple.")
         return None 
     else:        
