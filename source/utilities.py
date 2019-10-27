@@ -80,3 +80,13 @@ def imshow(name, mat, mapping=False):
     if r < 100:
         mat = cv.resize(mat,None,fx=4,fy=4)
     cv.imshow(name,mat)
+
+
+def getGaussianKernel2D(ksize,sigmaX,sigmaY):
+    if type(ksize) == tuple:
+        print("Ksize is",type(ksize),"is not Tuple.")
+        return None 
+    else:        
+        gaussian_x = cv.getGaussianKernel(ksize[0],sigmaX)
+        gaussian_y = cv.getGaussianKernel(ksize[1],sigmaY)
+        return gaussian_x * gaussian_y.T
