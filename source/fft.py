@@ -9,7 +9,13 @@ def spatial2freq(img):
     spectrum = np.fft.fftshift(spectrum)
     return spectrum
 
-
+def magnitude_amplication(magnitude):
+    rows,cols = magnitude.shape
+    magnitude[rows//2,cols//2] = 0
+    magnitude = magnitude - magnitude.mean()
+    magnitude[magnitude<0] = 0
+    return magnitude
+    
 def freq2spatial(spectrum):
     spectrum  = np.fft.ifftshift(spectrum )
     img  = np.fft.ifft2(spectrum )
