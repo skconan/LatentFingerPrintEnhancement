@@ -10,14 +10,14 @@ from utilities import *
 from fft import *
 import math
 img = cv.imread(r"E:\KSIP\Database\NIST14_Binary\F0000002.jpg",0)
-img = cv.blur(img,(3,3))
 # img = cv.imread(r"E:\KSIP\Database\NIST27\Latent\G002L3U.bmp",0)
+# img = cv.blur(img,(3,3))
 rows, cols = img.shape
 
 # result = img.copy()
 result_ff = np.ones((rows,cols),np.uint8)*255
-result_of = np.ones((rows,cols),np.uint8)*255
-# result_of = cv.cvtColor(img,cv.COLOR_GRAY2BGR)
+# result_of = np.ones((rows,cols),np.uint8)*255
+result_of = cv.cvtColor(img,cv.COLOR_GRAY2BGR)
 kernel = 64
 step = 16
 # kernel = 32
@@ -26,10 +26,11 @@ step = 16
 cir1 = np.zeros((kernel,kernel),np.uint8)
 cir2 = np.zeros((kernel,kernel),np.uint8)
 cv.circle(cir1,(kernel//2,kernel//2),3,(255,255,255),-1)
-cv.circle(cir2,(kernel//2,kernel//2),9,(255,255,255),-1)
+cv.circle(cir2,(kernel//2,kernel//2),12,(255,255,255),-1)
 bandpass = cir2 - cir1
+g = getGaussianKernel2D((kernel,kernel),16,16)
 cv.imshow("img",img)
-cv.imshow("bandpass",bandpass)
+imshow("bandpass",bandpass)
 for r in range(kernel//2,rows-kernel//2,step):
     for c in range(kernel//2,cols-kernel//2,step):
         roi = img[r-kernel//2:r+kernel//2, c-kernel//2:c+kernel//2].copy()
@@ -45,20 +46,29 @@ for r in range(kernel//2,rows-kernel//2,step):
         # print("dft",dft[0,0])
         # print(magnitude[15,15])
 
-        magnitude = magnitude - magnitude.max()
-        magnitude = np.abs(magnitude)
+        # magnitude = magnitude - magnitude.max()
+        # magnitude = np.abs(magnitude)
         # magnitude = normalize(magnitude)
         # magnitude = np.clip(magnitude,0,magnitude.max())
         # magnitude = normalize(magnitude)
         # magnitude = normalize(to_logscale(magnitude))
-        magnitude[kernel//2,kernel//2] = magnitude.max()
-        # for i in [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]:
-        #     magnitude[kernel//2+i[0],kernel//2+i[1]] = magnitude.max()
-        # magnitude[magnitude==magnitude.max()] = 0
-        magnitude = 255-normalize(magnitude)
-        y,x = np.where(magnitude==magnitude.max())
+        # magnitude[kernel//2,kernel//2] = magnitude.max()
+        
+        # print(magnitude.max())
+        # magnitude[kernel//2,kernel//2] = 0
+        # # for i in [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]:
+        # #     magnitude[kernel//2+i[0],kernel//2+i[1]] = magnitude.max()
+        # print(magnitude.max())
+        # # magnitude[magnitude==magnitude.max()] = 0
+        # magnitude = magnitude - magnitude.mean()
+        # magnitude[magnitude<0] = 0
+        magnitude = magnitude_amplification(magnitude)
+        # magnitude = np.abs(magnitude)
+
+        magnitude = normalize(magnitude)
         # print(x,y)
-        magnitude = cv.bitwise_and(magnitude,magnitude,mask=bandpass)
+        magnitude = cv.bitwise_and(magnitude,bandpass)
+        y,x = np.where(magnitude==magnitude.max())
         if len(x) >= 2:
             print("point max",x,y)
       
@@ -143,10 +153,10 @@ for r in range(kernel//2,rows-kernel//2,step):
             cv.line(mag_line,(kernel//2,0),(kernel//2,kernel),(255,255,255),1)
             cv.line(mag_line,(0,kernel//2),(kernel,kernel//2),(255,255,255),1)
             
-            # imshow("magnitude",magnitude)
-            # imshow("magnitude_line",mag_line)
-            # imshow("magnitude_mapping",magnitude, mapping=True)
-            cv.waitKey(1)
+            imshow("magnitude",magnitude)
+            imshow("magnitude_line",mag_line)
+            imshow("magnitude_mapping",magnitude, mapping=True)
+            cv.waitKey(-1)
 # cv.imshow('result_of',result_of)
 # cv.imshow("x",sobelx)
 # cv.imshow("y",sobely)
