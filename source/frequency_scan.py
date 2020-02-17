@@ -1,9 +1,10 @@
 import cv2 as cv
 from utilities import *
 from fft import *
+import numpy as np
+
 
 frame = None
-size = None
 canvas = None
 freq = None
 
@@ -20,6 +21,7 @@ def mouse_callback(event, cur_x, cur_y, flags, param):
     y_max = min(rows, cur_y+size)
 
     roi = frame[y_min:y_max, x_min:x_max]
+    var = np.var(roi)
     spectrum = spatial2freq(roi)
     magnitude = get_magnitude(spectrum)
     magnitude = magnitude_amplification(magnitude)
@@ -35,7 +37,7 @@ def mouse_callback(event, cur_x, cur_y, flags, param):
         p2 = x[1],y[1]
         freq = np.sqrt((p1[0]-p2[0])**2+(p1[1]-p2[1])**2)/2.
 
-    cv.putText(canvas, "Frequency = %.2f"%(freq), (10, 30),cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
+    cv.putText(canvas, "Frequency = %.2f Variance = %.2f"%(freq, var), (10, 30),cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 3)
 
     imshow("magnitude", magnitude)
     imshow("roi", roi)
