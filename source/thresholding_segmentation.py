@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 from fft import *
 
 
+
 def nothing(val):
     pass
 
 
 def frequency_estimation(img, kernel=64, step=16):
     rows, cols = img.shape
-    result_ff = np.zeros((rows, cols), np.float32)
+    result_ff = np.zeros((rows, cols), np.uint8)
+    
     cir1 = np.zeros((kernel, kernel), np.uint8)
     cir2 = np.zeros((kernel, kernel), np.uint8)
     cv.circle(cir1, (kernel//2, kernel//2), 2, (255, 255, 255), -1)
@@ -26,7 +28,7 @@ def frequency_estimation(img, kernel=64, step=16):
             magnitude = get_magnitude(spectrum)
             magnitude = magnitude_amplification(magnitude)
             magnitude = normalize(magnitude)
-            magnitude = cv.bitwise_and(magnitude, bandpass)
+            magnitude = cv.bitwise_and(magnitude, magnitude, mask=bandpass)
 
             y, x = np.where(magnitude == magnitude.max())
 
@@ -38,7 +40,7 @@ def frequency_estimation(img, kernel=64, step=16):
 
                 d = freq/kernel
 
-                if 2 <= freq <= 5 and np.var(roi) >= 500:
+                if 5 <= freq <= 10 and np.var(roi) >= 500:
                     result_ff[r-step//2:r+step//2, c-step//2:c+step//2] = 255
                 else:
                     result_ff[r-step//2:r+step//2, c-step//2:c+step//2] = 0
@@ -55,25 +57,19 @@ def thresholding():
     dir_nist14 = r"E:\OneDrive\KSIP\Database\NIST14"
     img_path = dir_nist14 + r"\F0000001.png"
     gray = cv.imread(img_path, 0)
-    # gray = imutils.resize(gray, width=500)
     plt.ion()
     cv.namedWindow("gray")
 
     cv.createTrackbar("i_min", "gray", 0, 255, nothing)
     cv.createTrackbar("i_max", "gray", 0, 255, nothing)
 
-    result_ff = frequency_estimation(gray, kernel=32, step=8)
+    result_ff = frequency_estimation(gray,step=8) #, kernel=32, step=8)
 
     gray = np.float32(gray)
     gray = (gray - gray.mean())
 
     gray = np.clip(gray, 0, 255)
     gray = np.uint8(gray)
-    # clahe = cv.createCLAHE(clipLimit=4, tileGridSize=(10, 10))
-    # print("ClipLimit", clahe.getClipLimit())
-    # gray = clahe.apply(gray)
-
-    # gray = cv.equalizeHist(gray)
 
     cv.imshow("original", gray)
     plt.ion()
